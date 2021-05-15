@@ -35,6 +35,11 @@ type (
 				}
 			}
 		}
+		Ignore struct{
+			Reply struct{
+				Toot int `default:"0"`
+			}
+		}
 	}
 	Toot struct {
 		ID        mastodon.ID `dynamo:"id,hash"`
@@ -134,6 +139,12 @@ func onUpdate(e *mastodon.UpdateEvent) {
 	}
 	if e.Status.Visibility != "private" {
 		return
+	}
+	if env.Ignore.Reply.Toot != 0 {
+		switch e.Status.InReplyToID.(type) {
+		case string:
+			return
+		}
 	}
 
 	log.Println("put toot to dynamodb:", e.Status.ID)
