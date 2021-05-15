@@ -18,32 +18,32 @@ type (
 			Table string `default:"private-toot-remover"`
 		}
 		Mastodon struct {
-			Server      string `default:"https://mstdn.plusminus.io"`
+			Server string `default:"https://mstdn.plusminus.io"`
 			Access struct {
 				Token string `default:""`
 			}
 		}
 		Watch struct {
-			Interval struct{
+			Interval struct {
 				Seconds int64 `default:"600"`
 			}
 		}
-		Delete struct{
-			Older struct{
-				Toot struct{
+		Delete struct {
+			Older struct {
+				Toot struct {
 					Seconds int64 `default:"3600"`
 				}
 			}
 		}
 	}
 	Toot struct {
-		ID mastodon.ID `dynamo:"id,hash"`
-		CreatedAt int64 `dynamo:"created_at"`
+		ID        mastodon.ID `dynamo:"id,hash"`
+		CreatedAt int64       `dynamo:"created_at"`
 	}
 )
 
 var (
-	me *mastodon.Account
+	me  *mastodon.Account
 	env *Env
 )
 
@@ -99,7 +99,7 @@ func timer(client *mastodon.Client) {
 			}
 		}
 
-		<- t.C
+		<-t.C
 	}
 }
 
@@ -138,7 +138,7 @@ func onUpdate(e *mastodon.UpdateEvent) {
 
 	log.Println("put toot to dynamodb:", e.Status.ID)
 	err := newTable(env.DynamoDB.Table).Put(Toot{
-		ID: e.Status.ID,
+		ID:        e.Status.ID,
 		CreatedAt: e.Status.CreatedAt.Unix(),
 	}).Run()
 	if err != nil {
